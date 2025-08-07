@@ -1,0 +1,75 @@
+package com.example.blescannerapp
+
+import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
+import android.util.Log
+
+class NotificationService : NotificationListenerService() {
+
+    companion object {
+        var listener: ((String) -> Unit)? = null
+    }
+
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        val packageName = sbn.packageName
+        val extras = sbn.notification.extras
+
+        val title = extras.getString("android.title")
+        val text = extras.getCharSequence("android.text")?.toString()
+        val subText = extras.getCharSequence("android.subText")?.toString()
+        val bigText = extras.getCharSequence("android.bigText")?.toString()
+        val summary = extras.getCharSequence("android.summaryText")?.toString()
+        val infoText = extras.getCharSequence("android.infoText")?.toString()
+        val textLines = extras.getCharSequenceArray("android.textLines")
+
+        if (packageName == "com.google.android.apps.maps") {
+            val messageBuilder = StringBuilder("Google Maps:\n")
+
+            if (!title.isNullOrEmpty()) messageBuilder.append("Tujuan: $title\n")
+
+            if (!text.isNullOrEmpty()) {
+                val arahEmoji = getDirectionEmoji(text)
+                messageBuilder.append("Arah: $text $arahEmoji\n")
+            }
+
+            if (!subText.isNullOrEmpty()) messageBuilder.append("Waktu: $subText\n")
+            if (!summary.isNullOrEmpty()) messageBuilder.append("Info: $summary\n")
+            if (!infoText.isNullOrEmpty()) messageBuilder.append("Jarak: $infoText\n")
+            if (!bigText.isNullOrEmpty()) messageBuilder.append("Detail: $bigText\n")
+
+            if (!textLines.isNullOrEmpty()) {
+                messageBuilder.append("📚 Navigasi Berikutnya:\n")
+                for (line in textLines) {
+                    val arrow = getDirectionEmoji(line.toString())
+                    messageBuilder.append(" - $line $arrow\n")
+                }
+            }
+
+            val fullMessage = messageBuilder.toString().trim()
+            Log.d("NotificationService", fullMessage)
+            listener?.invoke(fullMessage)
+        }
+
+        else if (packageName == "com.whatsapp") {
+            val message = "$title: $text"
+            Log.d("NotificationService", "WhatsApp: $message")
+            listener?.invoke("💬 WA - $message")
+        }
+    }
+
+    private fun getDirectionEmoji(text: String): String {
+        val lowercase = text.lowercase()
+        return when {
+            "belok kiri" in lowercase -> "⬅️"
+            "belok kanan" in lowercase -> "➡️"
+            "lurus" in lowercase -> "⬆️"
+            "putar balik" in lowercase -> "↩️"
+            "menuju" in lowercase -> "🧭"
+            "di bundaran" in lowercase -> "⭕"
+            "tiba di" in lowercase -> "🏁"
+            else -> ""
+        }
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification) {}
+}
