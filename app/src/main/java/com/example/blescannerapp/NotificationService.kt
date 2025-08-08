@@ -3,6 +3,11 @@ package com.example.blescannerapp
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.util.Base64
+import java.io.ByteArrayOutputStream
+
 
 class NotificationService : NotificationListenerService() {
 
@@ -45,6 +50,12 @@ class NotificationService : NotificationListenerService() {
                 }
             }
 
+            // Ambil ikon panah dari notifikasi
+            val arrowIconBase64 = getNotificationIconBase64(sbn)
+            if (arrowIconBase64 != null) {
+                messageBuilder.append("IconBase64: $arrowIconBase64\n")
+            }
+
             val fullMessage = messageBuilder.toString().trim()
             Log.d("NotificationService", fullMessage)
             listener?.invoke(fullMessage)
@@ -54,6 +65,33 @@ class NotificationService : NotificationListenerService() {
             val message = "$title: $text"
             Log.d("NotificationService", "WhatsApp: $message")
             listener?.invoke("💬 WA - $message")
+        }
+    }
+
+    private fun getNotificationIconBase64(sbn: StatusBarNotification): String? {
+        return try {
+            val context = applicationContext
+            val resources = packageManager.getResourcesForApplication(sbn.packageName)
+            val drawable = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                // API 23 ke atas
+                sbn.notification.smallIcon?.loadDrawable(context)
+            } else {
+                // API 21-22 pakai resource ID lama
+                val iconId = sbn.notification.icon
+                if (iconId != 0) resources.getDrawable(iconId, null) else null
+            }
+
+            if (drawable is BitmapDrawable) {
+                val bitmap = drawable.bitmap
+                val outputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("NotificationService", "Error getNotificationIconBase64", e)
+            null
         }
     }
 

@@ -22,7 +22,7 @@
                 android:id="@+id/appTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="BLE Notifikasi Bridge"
+                android:text="BayMax Tools"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="#333"
@@ -32,7 +32,7 @@
                 android:id="@+id/scanButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔍 Scan Perangkat BLE"
+                android:text="🔍 Scan Perangkat"
                 android:backgroundTint="#3F51B5"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="12dp"/>
