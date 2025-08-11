@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+import android.content.Context
 
 
 class NotificationService : NotificationListenerService() {
@@ -18,6 +19,10 @@ class NotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val packageName = sbn.packageName
         val extras = sbn.notification.extras
+
+        val prefs = getSharedPreferences("ble_settings", Context.MODE_PRIVATE)
+        val sendMaps = prefs.getBoolean("send_maps", true)
+        val sendWhatsapp = prefs.getBoolean("send_whatsapp", true)
 
         val title = extras.getString("android.title")
         val text = extras.getCharSequence("android.text")?.toString()
@@ -61,7 +66,7 @@ class NotificationService : NotificationListenerService() {
             listener?.invoke(fullMessage)
         }
 
-        else if (packageName == "com.whatsapp") {
+        else if (packageName == "com.whatsapp" && sendWhatsapp) {
             val message = "$title: $text"
             Log.d("NotificationService", "WhatsApp: $message")
             listener?.invoke("💬 WA - $message")

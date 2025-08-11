@@ -17,9 +17,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/baymaxlogo"
+        android:icon="@mipmap/baymaxlogo3"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/baymaxlogo_round"
+        android:roundIcon="@mipmap/baymaxlogo3_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BLEScannerApp">
 
@@ -33,19 +33,25 @@
             </intent-filter>
         </service>
 
-
+        <!-- Scan Activity (halaman pertama) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ScanActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BLEScannerApp"
             tools:ignore="RedundantLabel">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Control Activity -->
+        <activity android:name=".ControlActivity" />
+
+        <!-- Setting Activity -->
+        <activity android:name=".SettingsActivity" />
+
     </application>
 
 </manifest>
